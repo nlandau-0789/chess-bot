@@ -102,25 +102,6 @@ public class MyBot : IChessBot
             return sum * colorMultiplier;
         }
 
-        // (Move move, float value) findMove(Board board, int maxDepth)
-        // {
-        //     Move[] moves = board.GetLegalMoves();
-        //     if (maxDepth == 0){
-        //         return (moves[0], evaluate(board));
-        //     }
-        //     (Move move, float value)[] bestMoves = {(moves[0], float.NegativeInfinity), (moves[0], float.NegativeInfinity), (moves[0], float.NegativeInfinity)};
-        //     foreach (Move move in moves){
-        //         board.MakeMove(move);
-        //         if (findMove(board, maxDepth-1).value > bestMoves[2].value){
-        //             bestMoves[2] = (move, findMove(board, maxDepth-1).value);
-        //             bestMoves = bestMoves.OrderByDescending(tuple => tuple.value).ToArray();
-        //         }
-        //         board.UndoMove(move);
-        //     }
-        //     Console.WriteLine(bestMoves[0].move);
-        //     Console.WriteLine(bestMoves[0].value);
-        //     return bestMoves[0];
-        // }
         (Move move, float value) FindMove(Board board, int depth, bool maximizingPlayer)
         {
             Move[] moves = board.GetLegalMoves();
