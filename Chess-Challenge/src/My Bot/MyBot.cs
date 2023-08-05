@@ -140,16 +140,19 @@ public class MyBot : IChessBot
             // Console.WriteLine(bestMove);
             // Console.WriteLine(bestValue);
 
+            if (bestMove == Move.NullMove) {
+                return (moves[0], bestValue);
+            } 
             return (bestMove, bestValue);
         }
-        Console.WriteLine("");
-        Console.WriteLine($"after player : {Evaluate(board)}");
-        var (move, predict) = FindMove(board, 2, board.IsWhiteToMove);
-        board.MakeMove(move);
-        Console.WriteLine($"after bot : {Evaluate(board)}");
-        Console.WriteLine($"predict : {predict}");
+        // Console.WriteLine("");
+        // Console.WriteLine($"after player : {Evaluate(board)}");
+        var (move, predict) = FindMove(board, 6, board.IsWhiteToMove);
+        // board.MakeMove(move);
+        // Console.WriteLine($"after bot : {Evaluate(board)}");
+        // Console.WriteLine($"predict : {predict}");
 
-        board.UndoMove(move);
+        // board.UndoMove(move);
         return move;
     }
 }
