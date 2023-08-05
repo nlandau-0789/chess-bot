@@ -11,7 +11,7 @@ public class MyBot : IChessBot
         {
             int dist(Square sq1, Square sq2) { return (sq1.Rank - sq2.Rank) * (sq1.Rank - sq2.Rank) + (sq1.File - sq2.File) * (sq1.File - sq2.File); }
             PieceList[] pieceLists = board.GetAllPieceLists();
-            int colorMultiplier = board.IsWhiteToMove ? 1 : -1;
+            // int colorMultiplier = board.IsWhiteToMove ? 1 : -1;
             float sum = 0;
             // var value = new Dictionary<Piece, float>();
 
@@ -47,14 +47,14 @@ public class MyBot : IChessBot
             foreach (Piece piece in pieceLists[2])
             {
                 // value.Add(piece, dist(piece.Square, board.GetKingSquare(false)) / 4 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board)));
-                sum += dist(piece.Square, board.GetKingSquare(false)) / 4 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board));
+                sum += dist(piece.Square, board.GetKingSquare(false)) / 4 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board)  / 8);
             }
 
             // black bishops
             foreach (Piece piece in pieceLists[8])
             {
                 // value.Add(piece, dist(piece.Square, board.GetKingSquare(true)) / 4 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board)));
-                sum -= dist(piece.Square, board.GetKingSquare(true)) / 4 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board));
+                sum -= dist(piece.Square, board.GetKingSquare(true)) / 4 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board) / 8);
             }
 
             // white rooks
@@ -75,31 +75,32 @@ public class MyBot : IChessBot
             foreach (Piece piece in pieceLists[4])
             {
                 // value.Add(piece, 16 / dist(piece.Square, board.GetKingSquare(false)) + piece.Square.Rank / 2 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board)));
-                sum += 16 / dist(piece.Square, board.GetKingSquare(false)) + piece.Square.Rank / 2 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board));
+                sum += 16 / dist(piece.Square, board.GetKingSquare(false)) + piece.Square.Rank / 2 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board) / 8);
             }
 
             // black queen
             foreach (Piece piece in pieceLists[10])
             {
                 // value.Add(piece, 16 / dist(piece.Square, board.GetKingSquare(true)) + 4 - piece.Square.Rank / 2 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board)));
-                sum -= 16 / dist(piece.Square, board.GetKingSquare(true)) + 4 - piece.Square.Rank / 2 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board));
+                sum -= 16 / dist(piece.Square, board.GetKingSquare(true)) + 4 - piece.Square.Rank / 2 + BitboardHelper.GetNumberOfSetBits(BitboardHelper.GetSliderAttacks(piece.PieceType, piece.Square, board) / 8);
             }
 
             // white king
             foreach (Piece piece in pieceLists[5])
             {
                 // value.Add(piece, dist(piece.Square, new Square("d5")) + (board.IsInCheck() && board.IsWhiteToMove ? 10 : 0) + (board.IsInCheckmate() && board.IsWhiteToMove ? float.NegativeInfinity : 0));
-                sum += dist(piece.Square, new Square("d5")) + (board.IsInCheck() && board.IsWhiteToMove ? 10 : 0) + (board.IsInCheckmate() && board.IsWhiteToMove ? float.NegativeInfinity : 0);
+                sum += dist(piece.Square, new Square("d5")) + (board.IsInCheck() && board.IsWhiteToMove ? -50 : 0) + (board.IsInCheckmate() && board.IsWhiteToMove ? float.NegativeInfinity : 0);
             }
 
             // black king
             foreach (Piece piece in pieceLists[11])
             {
                 // value.Add(piece, dist(piece.Square, new Square("e4")) + (board.IsInCheck() && !board.IsWhiteToMove ? 10 : 0) + (board.IsInCheckmate() && !board.IsWhiteToMove ? float.NegativeInfinity : 0));
-                sum -= dist(piece.Square, new Square("e4")) + (board.IsInCheck() && !board.IsWhiteToMove ? 10 : 0) + (board.IsInCheckmate() && !board.IsWhiteToMove ? float.NegativeInfinity : 0);
+                sum -= dist(piece.Square, new Square("d4")) + (board.IsInCheck() && !board.IsWhiteToMove ? -50 : 0) + (board.IsInCheckmate() && !board.IsWhiteToMove ? float.NegativeInfinity : 0);
             }
 
-            return sum * colorMultiplier;
+            // return sum * colorMultiplier;
+            return sum;
         }
 
         (Move move, float value) FindMove(Board board, int depth, bool maximizingPlayer)
@@ -141,6 +142,14 @@ public class MyBot : IChessBot
 
             return (bestMove, bestValue);
         }
-        return FindMove(board, 4, !board.IsWhiteToMove).move;
+        Console.WriteLine("");
+        Console.WriteLine($"after player : {Evaluate(board)}");
+        var (move, predict) = FindMove(board, 2, board.IsWhiteToMove);
+        board.MakeMove(move);
+        Console.WriteLine($"after bot : {Evaluate(board)}");
+        Console.WriteLine($"predict : {predict}");
+
+        board.UndoMove(move);
+        return move;
     }
 }
